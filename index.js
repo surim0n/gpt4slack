@@ -12,6 +12,16 @@ const receiver = new ExpressReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
+app.post('/s', (req, res) => {
+    const { type, challenge } = req.body;
+
+    if (type === 'url_verification') {
+        res.send(challenge);
+    } else {
+        receiver.router(req, res);
+    }
+});
+
 app.use("/s", receiver.router);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
