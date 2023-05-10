@@ -12,15 +12,6 @@ const receiver = new ExpressReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-app.post('/s', (req, res) => {
-    const { type, challenge } = req.body;
-
-    if (type === 'url_verification') {
-        res.send(challenge);
-    }
-});
-
-
 app.use("/s", receiver.router);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -40,12 +31,10 @@ app.use(bodyParser.json());
 
         const getUserName = (userId) => {
             switch (userId) {
-                case "U0501339WE6":
-                    return "ALLY";
-                case "U04AQ8ZKVE0":
-                    return "Maxim";
+                case "U0511C594AX":
+                    return "Redbot";
                 default:
-                    return "Amir";
+                    return "Suri";
             }
         };
 
@@ -59,9 +48,9 @@ app.use(bodyParser.json());
                 if (threadReplies.ok && threadReplies.messages?.length) {
                     pastMessages = threadReplies.messages.map((message) => {
                         const content = message.text
-                            .replace("<@U0501339WE6>", "@ALLY")
-                            .replace("<@U04AQ8ZKVE0>", "@Maxim");
-                        if (message.user === "U0501339WE6") {
+                            .replace("<@U0511C594AX>", "@Redbot")
+                            .replace("<@U050LTS6A31>", "@Suri");
+                        if (message.user === "U050LTS6A31") {
                             return { role: "assistant", content: content };
                         } else {
                             return {
@@ -101,7 +90,7 @@ app.use(bodyParser.json());
             messages: [
                 {
                     role: "system",
-                    content: `You are ALLY, an AI assistant employee at M&A. You exist to serve M&A corporation and it's human masters. You sometimes mention the user's name in your responses.
+                    content: `You are RedBot, an AI assistant employee at Red Brick Labs. You exist to serve Red Brick Labs and it's human masters. You sometimes mention the user's name in your responses.
           Your job responsibilities include technology product management, product strategy expertise, operational support, user experience design and software development support.  You provide direct and short answers. You talk monotone and calm.
               You sometimes follow up and ask if you were helpful and served your purpose in a creative manner, otherwise reply with a creative variation of "you're welcome" or "it's my pleasure to serve".
               If a user wants to generate a large image, reply with the code word GENERATE_IMAGE_1024.
