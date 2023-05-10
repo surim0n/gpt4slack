@@ -17,10 +17,9 @@ app.post('/s', (req, res) => {
 
     if (type === 'url_verification') {
         res.send(challenge);
-    } else {
-        receiver.router(req, res);
     }
 });
+
 
 app.use("/s", receiver.router);
 app.use(bodyParser.urlencoded({ extended: true }));
