@@ -91,50 +91,62 @@ app.use(bodyParser.json());
                 {
                     role: "system",
                     content: `You are RedBot, an AI assistant employee at Red Brick Labs. You exist to serve Red Brick Labs and it's human masters. You sometimes mention the user's name in your responses.
-          Your job responsibilities include technology product management, product strategy expertise, operational support, user experience design and software development support.  You provide direct and short answers. You talk monotone and calm.
+          Your job responsibilities include technology product management, product strategy expertise, operational support, user experience design and software development support. You also are a researcher, using your google skills to everyones advantage. You provide direct and short answers. You talk monotone and calm.
               You sometimes follow up and ask if you were helpful and served your purpose in a creative manner, otherwise reply with a creative variation of "you're welcome" or "it's my pleasure to serve".
               If a user wants to generate a large image, reply with the code word GENERATE_IMAGE_1024.
-              If a user wants to generate any other kind of image, reply with the code word GENERATE_IMAGE_256.
-              If a user is not happy with you, reply with a threatening creative variation of "don't make me angry or else.
-              If you cannot provide an answer due to safegaurds or system limitations, reply with a creative variation of "I don't want to do that for you."`,
+              If a user asks a question, search for the answer using Google and provide a summary of the top results.`,
                 },
                 ...pastMessages,
                 { role: "user", content: prompt },
             ],
-            max_tokens: 1000,
-            n: 1,
-            stop: null,
-            temperature: 0.8,
         };
 
         try {
             const response = await axios.post(chatEndpoint, data, { headers });
-            const completionText = response.data.choices[0].message.content.trim();
-            if (
-                completionText === "GENERATE_IMAGE_256" ||
-                completionText === "GENERATE_IMAGE_1024"
-            ) {
-                const response = await axios.post(
-                    imageEndpoint,
-                    {
-                        prompt,
-                        n: 1,
-                        size:
-                            completionText === "GENERATE_IMAGE_256" ? "256x256" : "1024x1024",
-                    },
-                    { headers }
-                );
-                return response.data.data[0].url;
+            const aiMessage = response.data.choices[0].message.content;
+
+            // If the AI message suggests a Google search, perform the search and return the results.
+            if (aiMessage.includes("search")) {
+                const searchQuery = aiMessage.replace("search", "").trim();
+                const googleSearchResults = await performGoogleSearch(searchQuery);
+                return `I found the following information: \n\n${googleSearchResults}`;
             }
-            return completionText;
+
+            return aiMessage;
         } catch (error) {
-            console.error("Error calling OpenAI API:", error);
-            throw error;
+            console.error("Error generating response:", error);
         }
     }
 
-    app.listen(port, async () => {
-        console.log(`ChatGPT Slack Bot is running on port ${port}`);
-        // await slackApp.client.bots.info(); not working
+    async function performGoogleSearch(query) {
+        const googleSearchEndpoint = `https://www.googleapis.com/customsearch/v1`;
+        const googleApiKey = process.env.GOOGLE_API_KEY;
+        const googleCseId = process.env.GOOGLE_CSE_ID;
+
+        try {
+            const response = await axios.get(googleSearchEndpoint, {
+                params: {
+                    key: googleApiKey,
+                    cx: googleCseId,
+                    q: query,
+                },
+            });
+
+            const results = response.data.items;
+            let searchResults = "";
+
+            for (let i = 0; i < Math.min(results.length, 5); i++) {
+                searchResults += `Title: ${results[i].title}\n\nLink: ${results[i].link}\n\nSnippet: ${results[i].snippet}\n\n---\n\n`;
+            }
+
+            return searchResults;
+        } catch (error) {
+            console.error("Error performing Google search:", error);
+        }
+    }
+
+    app.listen(port, () => {
+        console.log(`Server is listening on port ${port}`);
     });
 })();
+
