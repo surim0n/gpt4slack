@@ -143,7 +143,9 @@ app.use(bodyParser.json());
 
             return searchResults;
         } catch (error) {
-            console.error("Error performing Google search:", error);
+            console.error("Error performing Google search:", error.message);
+            console.error("Error details:", error.response.data);
+            return "I'm sorry, I encountered an error while trying to perform a Google search.";
         }
     }
 
