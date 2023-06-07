@@ -3,7 +3,7 @@ const axios = require('axios');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { App, ExpressReceiver } = require("@slack/bolt");
-const RateLimit = require('express-rate-limit');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,14 +22,14 @@ const slackApp = new App({
 });
 
 // OpenAI API rate limiting
-const limiterOpenAI = new RateLimit({
+const limiterOpenAI = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 60, // limit each IP to 60 requests per windowMs
   delayMs: 0, // disable delaying - full speed until the max limit is reached
 });
 
 // Google API rate limiting
-const limiterGoogle = new RateLimit({
+const limiterGoogle = rateLimit({
   windowMs: 60 * 1000, // 1 minute
   max: 100, // limit each IP to 100 requests per windowMs
   delayMs: 0, // disable delaying - full speed until the max limit is reached
@@ -99,7 +99,7 @@ async function generateChatGptResponse(prompt, pastMessages) {
         messages: [
             {
                 role: "system",
-                content: "You are a helpful assistant.",
+                content: ""You are a helpful assistant.",
             },
             ...pastMessages,
             { role: "user", content: prompt },
@@ -159,6 +159,5 @@ async function googleSearch(query) {
         console.error("Error starting app:", error);
     }
 })();
-
 
 module.exports = app;
