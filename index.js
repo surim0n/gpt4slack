@@ -99,7 +99,7 @@ async function generateChatGptResponse(prompt, pastMessages) {
         messages: [
             {
                 role: "system",
-                content: ""You are a helpful assistant.",
+                content: "You are a helpful assistant.",
             },
             ...pastMessages,
             { role: "user", content: prompt },
