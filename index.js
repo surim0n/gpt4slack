@@ -152,8 +152,13 @@ async function googleSearch(query) {
 }
 
 (async () => {
-    await slackApp.start(process.env.PORT || 3000);
-    console.log("⚡️ Redbot is running!");
+    try {
+        await slackApp.start(process.env.PORT || 3000);
+        console.log("⚡️ Redbot is running!");
+    } catch (error) {
+        console.error("Error starting app:", error);
+    }
 })();
+
 
 module.exports = app;
