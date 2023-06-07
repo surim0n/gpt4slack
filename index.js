@@ -13,7 +13,7 @@ const receiver = new ExpressReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-app.use("/", receiver.router);
+app.use("/s", receiver.router);
 
 const slackApp = new App({
     token: process.env.SLACK_BOT_TOKEN,
