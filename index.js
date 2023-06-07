@@ -37,7 +37,10 @@ const limiterGoogle = rateLimit({
 
 app.use('/api/openai', limiterOpenAI);
 app.use('/api/google', limiterGoogle);
-
+receiver.router.post('/slack/events', (req, res) => {
+    console.log('Debugging /slack/events endpoint:', req.body);
+    res.sendStatus(200);
+  });
 slackApp.event("app_mention", async ({ event, say }) => {
   try {
     const chatGptResponse = await generateChatgptResponse(event.text);
