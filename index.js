@@ -1,24 +1,15 @@
 require('dotenv').config();
 const axios = require('axios');
-const express = require('express');
-const bodyParser = require('body-parser');
 const { App, ExpressReceiver } = require("@slack/bolt");
 const rateLimit = require('express-rate-limit');
-
-const app = express();
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 const receiver = new ExpressReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
-app.use("/s", receiver.router);
-
 const slackApp = new App({
     token: process.env.SLACK_BOT_TOKEN,
     receiver: receiver,
-    signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 // OpenAI API rate limiting
@@ -34,9 +25,6 @@ const limiterGoogle = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
   delayMs: 0, // disable delaying - full speed until the max limit is reached
 });
-
-app.use('/api/openai', limiterOpenAI);
-app.use('/api/google', limiterGoogle);
 
 slackApp.event("app_mention", async ({ event, say }) => {
   const getUserName = (userId) => {
@@ -118,6 +106,9 @@ async function generateChatGptResponse(prompt, pastMessages) {
 slackApp.command("/google", async ({ ack, say, command }) => {
     await ack();
     try {
+        const googleResponse =My apologies, the response was cut off. Here is the rest of the code:
+
+```javascript
         const googleResponse = await googleSearch(command.text);
         if (googleResponse?.items?.length) {
             const responseText = googleResponse.items
@@ -159,5 +150,3 @@ async function googleSearch(query) {
         console.error("Error starting app:", error);
     }
 })();
-
-module.exports = app;
